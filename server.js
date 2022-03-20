@@ -265,28 +265,6 @@ app.post('/api/:tables', verifyToken, (req, res) => {
 });
 
 
-// app.get('/api/:tablesss', (req,res) => {
-//     let tables = req.params.tables;
-//     if (!tables) {
-//         return res.status(400).send({ error: true, message: 'Not Thing!' })
-//     } else  {
-//         dbCon.query("SELECT * FROM ?? LIMIT 10", tables, (error, results, fields) => {
-//             if (error) throw error;
-//             let message = "";
-//             if (results === undefined || results.length == 0) {
-//                 message = 'No data';
-//             } else {
-//                 message = 'OK';
-//             }
-//             return res.send({
-//                 error: false,
-//                 data: results,
-//                 message: message
-//             })
-//         });
-//     }
-// });
-
 
 let port = 3000;
 app.listen(port, () => {
