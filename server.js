@@ -102,9 +102,8 @@ function verifyToken(req, res, next) {
         // Split at the space
         const bearer = bearerHeader.split(' ');
         // Get token from array
-        const bearerToken = bearer[1];
         // Set the token
-        req.token = bearerToken;
+        req.token = bearer[1];
         // Next middleware
         next();
     } else {
@@ -118,17 +117,43 @@ app.post('/api/:tables', verifyToken, (req, res) => {
 
     const secretkey = process.env.SECRETKEY;
 
-    jwt.verify(req.token, secretkey, (error, decoded) => {
+    jwt.verify(req.token, res, secretkey, (error, decoded) => {
         // const exp = authData.user['exp_date'];
         const dateNow = Math.round(Date.now() / 1000);
 
         if (error) {
-            res.status(403).json({"message": error,"status": 403});
+            res.status(403).json({"message": error, "status": 403});
             // throw err;
         } else {
             let tables = req.params.tables;
+
             if (!tables) {
                 return res.status(400).send({error: true, message: 'Not Found!'});
+            } else if (tables === 't_proceder_opd') {
+
+                dbCon.query("SELECT " +
+                    "t_proceder_opd.HOSPCODE,t_proceder_opd.hosname,t_proceder_opd.CID, " +
+                    "t_proceder_opd.HN,t_proceder_opd.DATE_SERV,t_proceder_opd.CLINIC, " +
+                    "t_proceder_opd.clinic_name,t_proceder_opd.SEQ, " +
+                    "convert(t_proceder_opd.PID,char) as PID, " +
+                    "t_proceder_opd.ICD10TM,t_proceder_opd.PROCEDURE_NAME, " +
+                    "t_proceder_opd.D_UPDATE,t_proceder_opd.hcode_refer_in, " +
+                    "t_proceder_opd.hname_refer_in,t_proceder_opd.hcode_refer_out, " +
+                    "t_proceder_opd.hname_refer_out " +
+                    "FROM " +
+                    "t_proceder_opd", data, (error, results, fields) => {
+                    if (error) {
+                        throw error;
+                    }
+                    let message = "OK";
+                    return res.json({
+                        dateNow,
+                        message,
+                        error: false,
+                        data: results,
+                        decoded
+                    })
+                });
             } else {
                 dbCon.query("SELECT * FROM ??", tables, (error, results, fields) => {
                     if (error) {
